@@ -7,8 +7,21 @@
 
   // Dans une page intégrée, l'adresse (#/...) n'est pas fiable : la route est gardée en mémoire.
   let current = EPS.ui.inFrame ? '#/' : (location.hash || '#/');
+  // Historique de navigation pour le bouton « Retour »
+  const stack = [];
+  let goingBack = false;
+  const parentOf = (h) => {
+    const path = h.replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean);
+    return path.length ? `#/${path.slice(0, -1).join('/')}` : null;
+  };
   function render() {
     if (!EPS.ui.inFrame) current = location.hash || '#/';
+    if (goingBack) goingBack = false;
+    else if (stack[stack.length - 1] !== current) stack.push(current);
+    if (stack.length > 50) stack.shift();
+    const back = document.getElementById('back-btn');
+    const target = stack.length > 1 ? stack[stack.length - 2] : parentOf(current);
+    back.hidden = !target;
     const [path, qs] = current.replace(/^#\/?/, '').split('?');
     EPS.query = Object.fromEntries(new URLSearchParams(qs || ''));
     const parts = decodeURIComponent(path).split('/').filter(Boolean);
@@ -43,6 +56,15 @@
       EPS.go(a.getAttribute('href'));
     });
   }
+  EPS.back = () => {
+    let target;
+    if (stack.length > 1) { stack.pop(); target = stack[stack.length - 1]; } else { target = parentOf(current); stack.pop(); }
+    if (!target) return;
+    if (stack[stack.length - 1] !== target) stack.push(target);
+    goingBack = true;
+    EPS.go(target);
+  };
+  document.getElementById('back-btn').onclick = () => EPS.back();
   EPS.rerender = render;
 
   document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');

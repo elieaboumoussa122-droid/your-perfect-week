@@ -108,14 +108,28 @@ window.EPS.views = window.EPS.views || {};
 
   /** Vrai quand l'application est affichée dans une page intégrée (ex. lien claude.ai). */
   const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
-  function download(blob, name) {
-    if (inFrame) { toast('Téléchargement indisponible dans la version en ligne : ouvrez la version installée (index.html).', 'err'); return; }
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  /** Enregistre un fichier : lien classique en local, capacité « downloads » sur la version en ligne. */
+  async function download(blob, name) {
+    if (!inFrame) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name; a.click();
+      return true;
+    }
+    let d = null;
+    try { d = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch { d = null; }
+    if (!d) { toast('Téléchargement indisponible ici : ouvrez la version installée (index.html).', 'err'); return; }
+    try { await d.save({ filename: name, data: blob }); toast('Fichier enregistré ✔'); return true; } catch (e) {
+      if (e && e.code === 'declined') return false;
+      toast(e && e.code === 'rate_limited' ? 'Une demande est déjà ouverte, réessayez dans un instant.' : 'Le fichier n\'a pas pu être enregistré ici.', 'err');
+    }
   }
-  function print() {
-    if (inFrame) { toast('Impression indisponible dans la version en ligne : ouvrez la version installée (index.html).', 'err'); return; }
-    window.print();
+  /** Impression : directe en local ; sur la version en ligne, fichier HTML du document qui s'imprime à l'ouverture. */
+  function print(el, title = 'document') {
+    if (!inFrame || !el) { window.print(); return; }
+    const css = [...document.querySelectorAll('style')].map((s) => s.textContent).join('\n');
+    const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${esc(title)}</title><style>${css}\nbody{background:#fff;padding:16px}.doc{border:0;box-shadow:none}</style></head><body><div class="doc">${el.innerHTML}</div><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;
+    const fname = `${title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'document'}.html`;
+    download(new Blob([html], { type: 'text/html' }), fname).then((ok) => ok && toast('Ouvrez le fichier enregistré : l\'impression se lance.'));
   }
 
   function setCrumbs(items) {

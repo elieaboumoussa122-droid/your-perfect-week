@@ -27,6 +27,7 @@
     team: [],
     events: [],
     holidays: [],
+    schoolYear: { start: '', end: '', periods: [], docId: '', docName: '' },
     customDocs: {},
     evaluations: {},
   });

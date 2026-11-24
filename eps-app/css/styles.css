@@ -63,6 +63,9 @@ h3 { font-size: 1.05rem; }
   background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5;
 }
 .menu-btn { display: none; border: 0; background: none; font-size: 1.4rem; cursor: pointer; }
+.back-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 6px 12px; font: inherit; font-size: .88rem; cursor: pointer; white-space: nowrap; }
+.back-btn:hover { border-color: var(--primary); color: var(--primary); }
+.back-btn:focus-visible, .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .crumbs { flex: 1; font-size: .9rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .crumbs a { color: var(--muted); text-decoration: none; }
 .crumbs a:hover { color: var(--primary); }
@@ -163,6 +166,19 @@ table.tbl input, table.tbl select { padding: 5px 7px; font-size: .85rem; }
 .student .name { font-weight: 600; font-size: .9rem; }
 .student .first { font-size: .85rem; color: var(--muted); }
 .student .badge { position: absolute; top: 8px; right: 8px; }
+.students.compact { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+.students.compact .student { padding: 10px 6px; }
+.students.compact .avatar { width: 60px; height: 60px; font-size: 1.15rem; }
+.students.compact .name { font-size: .8rem; }
+.students.compact .first { font-size: .78rem; }
+.progress { height: 8px; border-radius: 99px; background: #e6ecef; overflow: hidden; margin-top: 6px; }
+.progress i { display: block; height: 100%; border-radius: 99px; }
+ul.tight { margin: 0; padding-left: 18px; font-size: .9rem; }
+ul.tight li + li { margin-top: 3px; }
+table.tbl tr.done td { color: var(--muted); background: var(--surface-2); }
+table.tbl tr.next td { background: var(--primary-50); }
+.cal.small .cal-day { min-height: 74px; }
+.cal-flag { font-size: .72rem; font-weight: 700; color: var(--danger); margin-bottom: 2px; }
 
 /* Timetable grid */
 .tt { display: grid; grid-template-columns: 56px repeat(var(--days), minmax(110px, 1fr)); border: 1px solid var(--border); border-radius: var(--radius); background: #fff; overflow: hidden; min-width: 640px; }

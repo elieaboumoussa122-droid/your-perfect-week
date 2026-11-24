@@ -90,15 +90,9 @@
   }
 
   /** Dates des prochaines séances d'une classe d'après l'emploi du temps. */
+  /** Dates des prochaines séances d'une classe d'après l'emploi du temps (format jj/mm/aaaa). */
   function sessionDates(classId, startIso, n) {
-    if (!classId || !startIso) return [];
-    const out = [];
-    const d = parseISO(startIso);
-    for (let i = 0; i < 370 && out.length < n; i++) {
-      if (S.slotsOn(d).some((e) => e.classId === classId && e.type !== 'autre' && (!e.label || e.label === S.className(S.classById(classId))))) out.push(`${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`);
-      d.setDate(d.getDate() + 1);
-    }
-    return out;
+    return EPS.seq.datesFor(S.classById(classId), startIso, n).map(EPS.seq.fr);
   }
   function schoolYear() { const d = new Date(); const y = d.getMonth() >= 7 ? d.getFullYear() : d.getFullYear() - 1; return `${y}-${y + 1}`; }
 
@@ -111,13 +105,14 @@
     const tab = EPS.query.doc || 'sequence';
     const classes = S.sortClasses(S.state.classes.filter((c) => c.level === level));
     const classId = EPS.query.classe && S.classById(EPS.query.classe) ? EPS.query.classe : '';
+    const planned = classId && (S.classById(classId).sequences || []).find((x) => x.activityId === actId);
     const opts = {
-      sessions: Number(EPS.query.n || pr.sessionsPerSequence || 8),
-      minutes: Number(EPS.query.min || pr.sessionMinutes || 110),
+      sessions: Number(EPS.query.n || (planned && planned.sessions) || pr.sessionsPerSequence || 8),
+      minutes: Number(EPS.query.min || (planned && planned.minutes) || pr.sessionMinutes || 110),
       className: classId ? S.className(S.classById(classId)) : level,
       year: schoolYear(),
     };
-    const startIso = EPS.query.debut || '';
+    const startIso = EPS.query.debut || (planned && planned.start) || '';
     opts.dates = sessionDates(classId, startIso, opts.sessions);
     const key = `${actId}|${level}|${tab}`;
     const custom = S.state.customDocs[key];
@@ -168,7 +163,7 @@
       n: main.querySelector('#o-n').value, min: main.querySelector('#o-min').value,
     })}`);
     main.querySelector('#o-class').onchange = () => main.querySelector('#o-apply').click();
-    main.querySelector('#print').onclick = () => EPS.ui.print();
+    main.querySelector('#print').onclick = () => EPS.ui.print(main.querySelector('#doc'), `${a.nom} ${level} ${tab}`);
     const doc = main.querySelector('#doc');
     const editBtn = main.querySelector('#edit');
     editBtn.onclick = () => {

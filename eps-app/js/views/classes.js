@@ -83,7 +83,7 @@
     const c = S.classById(classId);
     if (!c) { main.innerHTML = '<div class="card empty">Classe introuvable.</div>'; return; }
     EPS.ui.setCrumbs([{ href: '#/', label: 'Accueil' }, { href: '#/classes', label: 'Classes' }, { href: `#/classes/${c.level}`, label: c.level }, { label: S.className(c) }]);
-    const tab = EPS.query.tab || 'eleves';
+    const tab = EPS.query.tab || 'apercu';
     const slots = S.state.timetable.filter((e) => e.classId === c.id);
     const inaptes = c.students.filter(isInapte);
 
@@ -92,17 +92,22 @@
         <div><h1><span style="color:${S.LEVEL_COLOR[c.level]}">●</span> ${esc(S.className(c))}</h1>
           <p>${c.students.length} élève(s)${inaptes.length ? ` · ${inaptes.length} inapte(s)` : ''}${slots.length ? ` · ${slots.map((e) => `${EPS.ui.DAYS[e.day]} ${EPS.ui.fmtTime(e.start)}`).join(', ')}` : ''}</p></div>
         <div class="row">
+          <button class="btn primary" id="plan">＋ Programmer une séquence</button>
           <button class="btn" id="rename">✎ Renommer</button>
           <button class="btn danger" id="delete">Supprimer la classe</button>
         </div>
       </div>
       <div class="tabs">
+        <button data-tab="apercu" class="${tab === 'apercu' ? 'active' : ''}">⭐ Vue d'ensemble</button>
         <button data-tab="eleves" class="${tab === 'eleves' ? 'active' : ''}">👥 Élèves</button>
-        <button data-tab="ca" class="${tab === 'ca' ? 'active' : ''}">🏅 Champs d'apprentissage</button>
+        <button data-tab="sequences" class="${tab === 'sequences' ? 'active' : ''}">📋 Séquences</button>
+        <button data-tab="calendrier" class="${tab === 'calendrier' ? 'active' : ''}">📅 Calendrier</button>
+        <button data-tab="ca" class="${tab === 'ca' ? 'active' : ''}">🏅 CA et évaluations</button>
         <button data-tab="creneaux" class="${tab === 'creneaux' ? 'active' : ''}">🕘 Créneaux</button>
       </div>
       <div id="tab"></div>`;
     main.querySelectorAll('[data-tab]').forEach((b) => { b.onclick = () => EPS.go(`#/classes/${c.level}/${c.id}?tab=${b.dataset.tab}`); });
+    main.querySelector('#plan').onclick = () => EPS.classProgram.sequenceModal(c);
     main.querySelector('#rename').onclick = () => EPS.ui.modal({
       title: 'Renommer la classe',
       body: `<div class="form-grid"><label class="field">Niveau<select name="level">${S.LEVELS.map((l) => `<option ${l === c.level ? 'selected' : ''}>${l}</option>`).join('')}</select></label><label class="field">Section<input type="text" name="section" value="${esc(c.section)}"></label></div>`,
@@ -119,7 +124,10 @@
     const el = main.querySelector('#tab');
     if (tab === 'ca') return caTab(el, c);
     if (tab === 'creneaux') return slotsTab(el, c, slots);
-    studentsTab(el, c);
+    if (tab === 'sequences') return EPS.classProgram.sequencesTab(el, c);
+    if (tab === 'calendrier') return EPS.classProgram.calendarTab(el, c);
+    if (tab === 'eleves') return studentsTab(el, c);
+    EPS.classProgram.overview(el, c);
   }
 
   function studentsTab(el, c) {
@@ -268,5 +276,5 @@
       : `<div class="card empty">Aucun créneau associé à cette classe.<br><br><a class="btn primary" href="#/emploi-du-temps">Importer / compléter mon emploi du temps</a></div>`;
   }
 
-  EPS.classesUI = { avatar, isInapte, sortStudents };
+  EPS.classesUI = { avatar, isInapte, sortStudents, studentModal };
 })(window.EPS);

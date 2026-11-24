@@ -68,6 +68,7 @@
         <strong style="min-width:110px">${fmtTime(e.start)} – ${fmtTime(e.end)}</strong>
         ${c ? `<a href="#/classes/${c.level}/${c.id}"><strong>${esc(S.entryLabel(e))}</strong></a>` : `<strong>${esc(S.entryLabel(e))}</strong>`}
         <span class="muted small">${esc(e.place || '')}</span>
+        ${(() => { const ses = c && EPS.seq.isClassSession(e, c) && EPS.seq.sessionOn(c, isoDate(now)); return ses ? `<span class="chip" style="background:${ses.seq.ca.color}22;color:${ses.seq.ca.color}">Séance ${ses.k}/${ses.seq.sessions} · ${esc(ses.seq.activity.nom)}</span>` : ''; })()}
         ${c ? `<span class="spacer"></span><span class="chip gray">${c.students.length} élèves</span>` : ''}
       </div>`;
     }

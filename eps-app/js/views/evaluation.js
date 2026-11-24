@@ -42,7 +42,7 @@
       </div>
       <div class="doc">${html}</div>
       <div id="grid"></div>`;
-    main.querySelector('#print').onclick = () => EPS.ui.print();
+    main.querySelector('#print').onclick = () => EPS.ui.print(main.querySelector('.doc'), `evaluation ${a.nom} ${level}`);
     main.querySelector('#cls').onchange = (e) => EPS.go(`#/evaluation/${actId}/${level}${e.target.value ? `?classe=${e.target.value}` : ''}`);
 
     const grid = main.querySelector('#grid');
