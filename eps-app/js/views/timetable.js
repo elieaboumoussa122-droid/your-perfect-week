@@ -186,7 +186,20 @@
   function showPdf(key, title) {
     const data = S.getFile(key);
     if (!data) { EPS.ui.toast('Aucun PDF enregistré', 'err'); return; }
-    EPS.ui.modal({ title, wide: true, body: `<iframe src="${EPS.ui.blobUrl(data)}" style="width:100%;height:75vh;border:0;border-radius:8px"></iframe><p class="small"><a href="${data}" download="emploi-du-temps.pdf">Télécharger le PDF</a></p>` });
+    EPS.ui.modal({
+      title, wide: true, body: '<div class="pdf-preview" id="pv" style="max-height:78vh"><p class="muted" style="padding:16px">Chargement du PDF…</p></div>',
+      onMount: async (m) => {
+        const pv = m.querySelector('#pv');
+        try {
+          const pdfjs = await EPS.pdf.loadPdfJs();
+          const bin = atob(data.split(',')[1]); const arr = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          const doc = await pdfjs.getDocument({ data: arr }).promise;
+          pv.innerHTML = '';
+          for (let n = 1; n <= doc.numPages; n++) { const c = document.createElement('canvas'); pv.appendChild(c); await EPS.pdf.renderPage(doc, n, c, 2); }
+        } catch { pv.innerHTML = `<iframe src="${EPS.ui.blobUrl(data)}" style="width:100%;height:75vh;border:0"></iframe>`; }
+      },
+    });
   }
 
   /* ---------- Vue « Mon emploi du temps » ---------- */

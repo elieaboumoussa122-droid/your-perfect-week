@@ -5,8 +5,11 @@
     equipe: 'team', ca: 'ca', evaluation: 'evaluation', sauvegarde: 'backup',
   };
 
+  // Dans une page intégrée, l'adresse (#/...) n'est pas fiable : la route est gardée en mémoire.
+  let current = EPS.ui.inFrame ? '#/' : (location.hash || '#/');
   function render() {
-    const [path, qs] = location.hash.replace(/^#\/?/, '').split('?');
+    if (!EPS.ui.inFrame) current = location.hash || '#/';
+    const [path, qs] = current.replace(/^#\/?/, '').split('?');
     EPS.query = Object.fromEntries(new URLSearchParams(qs || ''));
     const parts = decodeURIComponent(path).split('/').filter(Boolean);
     const key = parts[0] || '';
@@ -28,10 +31,21 @@
     document.getElementById('sidebar-foot').innerHTML = who ? `Connecté : <strong>${EPS.ui.esc(who)}</strong><br>Données enregistrées sur cet appareil` : 'Données enregistrées sur cet appareil';
   }
 
-  EPS.go = (hash) => { if (location.hash === hash) render(); else location.hash = hash; };
+  EPS.go = (hash) => {
+    if (EPS.ui.inFrame) { current = hash; render(); return; }
+    if (location.hash === hash) render(); else location.hash = hash;
+  };
+  if (EPS.ui.inFrame) {
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#/"], a[href="#"]');
+      if (!a) return;
+      e.preventDefault();
+      EPS.go(a.getAttribute('href'));
+    });
+  }
   EPS.rerender = render;
 
   document.getElementById('menu-btn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
-  window.addEventListener('hashchange', render);
+  if (!EPS.ui.inFrame) window.addEventListener('hashchange', render);
   EPS.store.loadFiles().then(render);
 })(window.EPS);

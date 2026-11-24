@@ -135,10 +135,7 @@
         m.querySelector('#exp').onclick = () => {
           const p = S.state.profile;
           const data = { app: 'eps-pro-edt', from: { firstName: p.firstName, lastName: p.lastName }, timetable: S.state.timetable.map((e) => ({ ...e, label: S.entryLabel(e), classId: '' })) };
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
-          a.download = `edt-${(p.lastName || 'prof').toLowerCase()}.json`;
-          a.click();
+          EPS.ui.download(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }), `edt-${(p.lastName || 'prof').toLowerCase()}.json`);
         };
         m.querySelector('#imp').onchange = async (e) => {
           let n = 0;

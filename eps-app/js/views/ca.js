@@ -95,7 +95,7 @@
     const out = [];
     const d = parseISO(startIso);
     for (let i = 0; i < 370 && out.length < n; i++) {
-      if (S.slotsOn(d).some((e) => e.classId === classId)) out.push(`${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`);
+      if (S.slotsOn(d).some((e) => e.classId === classId && e.type !== 'autre' && (!e.label || e.label === S.className(S.classById(classId))))) out.push(`${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`);
       d.setDate(d.getDate() + 1);
     }
     return out;
@@ -168,7 +168,7 @@
       n: main.querySelector('#o-n').value, min: main.querySelector('#o-min').value,
     })}`);
     main.querySelector('#o-class').onchange = () => main.querySelector('#o-apply').click();
-    main.querySelector('#print').onclick = () => window.print();
+    main.querySelector('#print').onclick = () => EPS.ui.print();
     const doc = main.querySelector('#doc');
     const editBtn = main.querySelector('#edit');
     editBtn.onclick = () => {

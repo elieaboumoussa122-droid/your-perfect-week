@@ -37,11 +37,12 @@
         <div class="row">
           <label class="field" style="min-width:180px">Classe à évaluer<select id="cls"><option value="">— Choisir —</option>${classes.map((x) => `<option value="${x.id}" ${c && x.id === c.id ? 'selected' : ''}>${esc(S.className(x))}</option>`).join('')}</select></label>
           <a class="btn" style="align-self:flex-end" href="#/ca/${a.ca}/${a.id}/${level}${c ? `?classe=${c.id}` : ''}">Séquence →</a>
-          <button class="btn primary" style="align-self:flex-end" onclick="window.print()">🖨 Imprimer</button>
+          <button class="btn primary" style="align-self:flex-end" id="print">🖨 Imprimer</button>
         </div>
       </div>
       <div class="doc">${html}</div>
       <div id="grid"></div>`;
+    main.querySelector('#print').onclick = () => EPS.ui.print();
     main.querySelector('#cls').onchange = (e) => EPS.go(`#/evaluation/${actId}/${level}${e.target.value ? `?classe=${e.target.value}` : ''}`);
 
     const grid = main.querySelector('#grid');
@@ -98,10 +99,7 @@
       const head = ['Nom', 'Prénom', ...crit.map((cr) => (ly ? `${cr.afl} ${cr.critere}` : cr.critere)), 'Absence', 'Résultat'];
       const rows = students.map((s) => { const r = data[s.id] || {}; return [s.lastName, s.firstName, ...crit.map((_, i) => r[i] || ''), r.abs || '', result(r)]; });
       const csv = [head, ...rows].map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n');
-      const el = document.createElement('a');
-      el.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
-      el.download = `evaluation-${actId}-${S.className(c).replace(/\s/g, '')}.csv`;
-      el.click();
+      EPS.ui.download(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), `evaluation-${actId}-${S.className(c).replace(/\s/g, '')}.csv`);
     };
   }
 })(window.EPS);

@@ -106,6 +106,18 @@ window.EPS.views = window.EPS.views || {};
     return out;
   }
 
+  /** Vrai quand l'application est affichée dans une page intégrée (ex. lien claude.ai). */
+  const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
+  function download(blob, name) {
+    if (inFrame) { toast('Téléchargement indisponible dans la version en ligne : ouvrez la version installée (index.html).', 'err'); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  }
+  function print() {
+    if (inFrame) { toast('Impression indisponible dans la version en ligne : ouvrez la version installée (index.html).', 'err'); return; }
+    window.print();
+  }
+
   function setCrumbs(items) {
     const el = document.getElementById('crumbs');
     el.innerHTML = items.map((it, i) => (i === items.length - 1
@@ -115,6 +127,6 @@ window.EPS.views = window.EPS.views || {};
 
   EPS.ui = {
     esc, uid, DAYS, MONTHS, pad, isoDate, parseISO, longDate, toMin, fromMin, fmtTime, initials,
-    modal, confirm, toast, readAsDataURL, readAsArrayBuffer, resizeImage, blobUrl, formData, setCrumbs,
+    modal, confirm, toast, inFrame, download, print, readAsDataURL, readAsArrayBuffer, resizeImage, blobUrl, formData, setCrumbs,
   };
 })(window.EPS);

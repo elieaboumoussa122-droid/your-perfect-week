@@ -23,10 +23,7 @@
         <button class="btn danger" id="reset">Tout effacer sur cet appareil</button>
       </div>`;
     main.querySelector('#exp').onclick = () => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([S.exportAll()], { type: 'application/json' }));
-      a.download = `eps-pro-sauvegarde-${EPS.ui.isoDate(new Date())}.json`;
-      a.click();
+      EPS.ui.download(new Blob([S.exportAll()], { type: 'application/json' }), `eps-pro-sauvegarde-${EPS.ui.isoDate(new Date())}.json`);
     };
     main.querySelector('#imp').onchange = async (e) => {
       const f = e.target.files[0]; if (!f) return;
