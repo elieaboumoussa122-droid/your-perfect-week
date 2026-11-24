@@ -11,29 +11,33 @@
     const start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
     const cells = [...Array(42)].map((_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
     const weeks = cells[35].getMonth() !== first.getMonth() ? 35 : 42;
+    const all = EPS.query.tout === '1';
     const todayIso = isoDate(now);
 
     main.innerHTML = `
       <div class="page-head">
         <div><h1>Calendrier</h1><p>Votre emploi du temps est reporté automatiquement chaque semaine (hors vacances, semaines A/B gérées).</p></div>
-        <div class="row"><button class="btn" id="holidays">📘 Année scolaire</button><button class="btn primary" id="add">＋ Événement</button></div>
+        <div class="row"><button class="btn" id="holidays">Année scolaire</button><button class="btn primary" id="add">＋ Événement</button></div>
       </div>
       ${yearCard(now)}
       <div class="row" style="margin-bottom:12px">
-        <a class="btn sm" href="#/calendrier?m=${off - 1}">‹</a>
-        <a class="btn sm" href="#/calendrier?m=0">Aujourd'hui</a>
-        <a class="btn sm" href="#/calendrier?m=${off + 1}">›</a>
+        <a class="btn sm" href="#/calendrier?m=${off - 1}${all ? '&tout=1' : ''}" aria-label="Mois précédent">‹</a>
+        <a class="btn sm" href="#/calendrier?m=0${all ? '&tout=1' : ''}">Aujourd'hui</a>
+        <a class="btn sm" href="#/calendrier?m=${off + 1}${all ? '&tout=1' : ''}" aria-label="Mois suivant">›</a>
         <h2 style="margin:0 8px;text-transform:capitalize">${MONTHS[first.getMonth()]} ${first.getFullYear()}</h2>
+        <span class="spacer"></span>
+        <div class="seg" role="group" aria-label="Créneaux affichés"><a class="seg-a ${all ? '' : 'active'}" href="#/calendrier?m=${off}">Cours d'EPS</a><a class="seg-a ${all ? 'active' : ''}" href="#/calendrier?m=${off}&tout=1">Tout</a></div>
       </div>
       <div class="cal">
         ${['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((d) => `<div class="cal-dow">${d}</div>`).join('')}
         ${cells.slice(0, weeks).map((d) => {
           const iso = isoDate(d);
-          const slots = S.slotsOn(d);
+          const slots = S.slotsOn(d).filter((e) => all || e.type !== 'autre');
           const evs = S.state.events.filter((e) => e.date === iso);
           const hol = S.isHoliday(d);
           const items = [...evs.map((e) => `<div class="cal-item ev" title="${esc(e.title)}">${e.start ? fmtTime(e.start) + ' ' : ''}${esc(e.title)}</div>`),
-            ...slots.map((e) => `<div class="cal-item" style="background:${S.entryColor(e)}" title="${esc(S.entryLabel(e))}">${fmtTime(e.start)} ${esc(S.entryLabel(e))}</div>`)];
+            ...slots.map((e) => { const c = e.classId && S.classById(e.classId); const ses = c && EPS.seq.isClassSession(e, c) && EPS.seq.sessionOn(c, iso);
+              return `<div class="cal-item" style="background:${S.entryColor(e)}" title="${esc(`${fmtTime(e.start)} ${S.entryLabel(e)}${ses ? ` — séance ${ses.k}/${ses.seq.sessions} ${ses.seq.activity.nom}` : ''}`)}">${fmtTime(e.start)} ${esc(c ? S.className(c) : S.entryLabel(e))}${ses ? ` · S${ses.k}` : ''}</div>`; })];
           return `<div class="cal-day ${d.getMonth() !== first.getMonth() ? 'other' : ''} ${iso === todayIso ? 'today' : ''} ${hol ? 'holiday' : ''}" data-d="${iso}">
             <span class="num">${d.getDate()}</span>${(S.state.schoolYear.periods || []).filter((p) => p.from === iso).map((p) => `<span class="chip" style="font-size:.65rem">${esc(p.label)}</span>`).join('')}${hol && (d.getDay() === 1 || iso === hol.from) ? `<span class="small muted"> ${esc(hol.label)}</span>` : ''}
             ${items.slice(0, 4).join('')}${items.length > 4 ? `<div class="cal-more">+${items.length - 4}</div>` : ''}
@@ -110,7 +114,7 @@
       nextHol ? `<div class="stat"><span class="l">Prochaines vacances</span><span class="v" style="font-size:1.05rem">${esc(nextHol.label)} — ${nextHol.from <= iso ? 'en cours' : `dans ${days(iso, nextHol.from)} j`}</span></div>` : '',
       y.end && y.end >= iso ? `<div class="stat"><span class="l">Fin de l'année</span><span class="v" style="font-size:1.05rem">dans ${days(iso, y.end)} jours</span></div>` : '',
     ].filter(Boolean);
-    return `<div class="card" style="margin-bottom:14px"><div class="card-head"><h2>📘 Année scolaire</h2><div class="row">${y.docId && S.getFile(y.docId) ? `<button class="btn sm" id="year-doc">📄 Calendrier officiel</button>` : ''}<button class="btn sm" data-year>Modifier</button></div></div>
+    return `<div class="card" style="margin-bottom:14px"><div class="card-head"><h2>Année scolaire</h2><div class="row">${y.docId && S.getFile(y.docId) ? `<button class="btn sm" id="year-doc">Calendrier officiel</button>` : ''}<button class="btn sm" data-year>Modifier</button></div></div>
       <div class="grid grid-4 keep2">${items.join('')}</div></div>`;
   }
 
@@ -155,7 +159,7 @@
         <p class="muted small" style="margin:4px 0 8px">Pas de cours ces jours-là : ils n'apparaissent pas dans le calendrier et ne comptent pas dans les séquences.</p>
         <div class="tbl-wrap" id="t-hol"></div>
         <h3 style="margin-top:18px">Calendrier officiel de l'établissement</h3>
-        <div class="row"><label class="btn">📎 Joindre le PDF ou une image<input type="file" accept="application/pdf,image/*" id="y-doc" hidden></label>
+        <div class="row"><label class="btn">Joindre le PDF ou une image<input type="file" accept="application/pdf,image/*" id="y-doc" hidden></label>
           <span class="muted small" id="y-docname">${y.docName ? esc(y.docName) : 'Aucun document'}</span></div>`,
       actions: [{ label: 'Annuler' }, { label: 'Enregistrer', primary: true, onClick: async (m) => {
         y.start = m.querySelector('#y-start').value; y.end = m.querySelector('#y-end').value;

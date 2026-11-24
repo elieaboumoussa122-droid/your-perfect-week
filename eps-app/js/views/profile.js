@@ -18,7 +18,7 @@
           <div id="photo-wrap">${photo ? `<img class="avatar lg" src="${photo}" alt="">` : `<div class="avatar lg" style="margin:0 auto">${esc(EPS.ui.initials(p))}</div>`}</div>
           <h2 style="margin-top:12px">${esc([p.civilite, p.firstName, p.lastName].filter(Boolean).join(' ') || 'Professeur d\'EPS')}</h2>
           <p class="muted small">${esc(p.school.name || 'Établissement non renseigné')}</p>
-          <label class="btn sm" style="margin-top:6px">📷 Changer la photo<input type="file" accept="image/*" id="photo" hidden></label>
+          <label class="btn sm" style="margin-top:6px">Changer la photo<input type="file" accept="image/*" id="photo" hidden></label>
           <div style="margin-top:16px;text-align:left">
             <div class="muted small" style="margin-bottom:6px">Mes classes (${classes.length})</div>
             <div class="row">${classes.map((c) => `<a class="chip" style="background:${S.LEVEL_COLOR[c.level]}22;color:${S.LEVEL_COLOR[c.level]}" href="#/classes/${c.level}/${c.id}">${esc(S.className(c))}</a>`).join('') || '<span class="muted small">Aucune — <a href="#/classes">créer</a></span>'}</div>

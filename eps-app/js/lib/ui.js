@@ -132,6 +132,9 @@ window.EPS.views = window.EPS.views || {};
     download(new Blob([html], { type: 'text/html' }), fname).then((ok) => ok && toast('Ouvrez le fichier enregistré : l\'impression se lance.'));
   }
 
+  const ICONS = {"home": "<path d=\"M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z\"/>", "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6\"/>", "users": "<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5\"/><path d=\"M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.5 2.4 3.5 5.2\"/>", "calendar": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "grid": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18M9 9v11M15 9v11\"/>", "target": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"12\" r=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"1.5\"/>", "check": "<rect x=\"5\" y=\"4\" width=\"14\" height=\"17\" rx=\"2\"/><path d=\"M9 4V3h6v1M9 13l2 2 4-4\"/>", "save": "<path d=\"M12 3v12M7 10l5 5 5-5M4 21h16\"/>", "layers": "<path d=\"m12 3 9 5-9 5-9-5 9-5z\"/><path d=\"m3 13 9 5 9-5\"/>"};
+  const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+
   function setCrumbs(items) {
     const el = document.getElementById('crumbs');
     el.innerHTML = items.map((it, i) => (i === items.length - 1
@@ -141,6 +144,6 @@ window.EPS.views = window.EPS.views || {};
 
   EPS.ui = {
     esc, uid, DAYS, MONTHS, pad, isoDate, parseISO, longDate, toMin, fromMin, fmtTime, initials,
-    modal, confirm, toast, inFrame, download, print, readAsDataURL, readAsArrayBuffer, resizeImage, blobUrl, formData, setCrumbs,
+    modal, confirm, toast, icon, inFrame, download, print, readAsDataURL, readAsArrayBuffer, resizeImage, blobUrl, formData, setCrumbs,
   };
 })(window.EPS);

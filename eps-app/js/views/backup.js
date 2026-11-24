@@ -7,12 +7,12 @@
       <div class="page-head"><div><h1>Sauvegarde</h1><p>Toutes vos données sont enregistrées dans ce navigateur, sur cet appareil.</p></div></div>
       <div class="grid grid-2">
         <div class="card">
-          <h2>⬇ Exporter</h2>
+          <h2>Exporter</h2>
           <p class="muted">Un fichier unique contenant profil, classes, élèves (avec photos), emplois du temps, événements, documents personnalisés et évaluations. Pensez à le faire régulièrement, ou pour passer sur un autre ordinateur.</p>
           <button class="btn primary" id="exp">Télécharger ma sauvegarde</button>
         </div>
         <div class="card">
-          <h2>⬆ Restaurer</h2>
+          <h2>Restaurer</h2>
           <p class="muted">Remplace les données actuelles par celles d'un fichier de sauvegarde.</p>
           <label class="btn">Choisir un fichier…<input type="file" accept=".json,application/json" id="imp" hidden></label>
         </div>

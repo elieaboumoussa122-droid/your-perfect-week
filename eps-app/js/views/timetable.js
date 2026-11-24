@@ -216,9 +216,9 @@
       <div class="page-head">
         <div><h1>Mon emploi du temps</h1><p>${tt.length} créneau(x) · ${Math.round(totalMin / 60 * 10) / 10} h de cours hebdomadaires (hors semaines A/B)</p></div>
         <div class="row">
-          ${hasPdf ? '<button class="btn" id="pdf">📄 PDF original</button>' : ''}
+          ${hasPdf ? '<button class="btn" id="pdf">PDF original</button>' : ''}
           <button class="btn" id="add">＋ Créneau</button>
-          <button class="btn primary" id="import">⬆ Importer mon emploi du temps (PDF)</button>
+          <button class="btn primary" id="import">Importer mon emploi du temps (PDF)</button>
         </div>
       </div>
       ${tt.length ? '' : '<div class="notice" style="margin-bottom:14px">Importez le PDF fourni par votre établissement : vos créneaux apparaîtront ici et dans le calendrier, sans avoir à rouvrir le PDF.</div>'}

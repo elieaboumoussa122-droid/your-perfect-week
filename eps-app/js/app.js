@@ -2,7 +2,7 @@
 (function (EPS) {
   const routes = {
     '': 'home', profil: 'profile', classes: 'classes', calendrier: 'calendar', 'emploi-du-temps': 'timetable',
-    equipe: 'team', ca: 'ca', evaluation: 'evaluation', sauvegarde: 'backup',
+    equipe: 'team', ca: 'ca', evaluation: 'evaluation', sauvegarde: 'backup', programmation: 'programmation',
   };
 
   // Dans une page intégrée, l'adresse (#/...) n'est pas fiable : la route est gardée en mémoire.

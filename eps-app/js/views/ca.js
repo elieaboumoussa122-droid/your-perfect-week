@@ -37,7 +37,7 @@
           <div class="tile-sub">${EPS.activities.byCA(c.id).map((a) => a.nom).slice(0, 5).join(', ')}…</div></a>`).join('')}
       </div>
       <div class="card" style="margin-top:20px">
-        <div class="card-head"><h2>✅ Fiche d'évaluation par activité</h2><a class="btn sm" href="#/evaluation">Toutes les fiches</a></div>
+        <div class="card-head"><h2>Fiche d'évaluation par activité</h2><a class="btn sm" href="#/evaluation">Toutes les fiches</a></div>
         <p class="muted small">Choisissez une activité et un niveau pour ouvrir la grille d'évaluation (critères et degrés d'acquisition).</p>
         <div class="row">
           <select id="ev-act" style="max-width:320px">${cas.map((c) => `<optgroup label="${c.id} — ${esc(c.court)}">${EPS.activities.byCA(c.id).map((a) => `<option value="${a.id}">${esc(a.nom)}</option>`).join('')}</optgroup>`).join('')}</select>
@@ -143,13 +143,13 @@
           ${classId && !startIso ? '<p class="muted small" style="margin:8px 0 0">Indiquez la date de la 1re séance : les dates sont calculées d\'après votre emploi du temps (vacances exclues).</p>' : ''}
         </div>
         <div class="tabs">
-          <button data-doc="sequence" class="${tab === 'sequence' ? 'active' : ''}">📋 Plan de séquence</button>
-          <button data-doc="seances" class="${tab === 'seances' ? 'active' : ''}">🗓 Plans de séance (${opts.sessions})</button>
-          <button data-doc="evaluation" class="${tab === 'evaluation' ? 'active' : ''}">✅ Fiche d'évaluation</button>
+          <button data-doc="sequence" class="${tab === 'sequence' ? 'active' : ''}">Plan de séquence</button>
+          <button data-doc="seances" class="${tab === 'seances' ? 'active' : ''}">Plans de séance (${opts.sessions})</button>
+          <button data-doc="evaluation" class="${tab === 'evaluation' ? 'active' : ''}">Fiche d'évaluation</button>
         </div>
         <div class="row" style="margin-bottom:12px">
-          <button class="btn primary" id="print">🖨 Imprimer / PDF</button>
-          <button class="btn" id="edit">✎ Personnaliser</button>
+          <button class="btn primary" id="print">Imprimer</button>
+          <button class="btn" id="edit">Personnaliser</button>
           ${custom ? '<span class="chip warn">Version personnalisée</span><button class="btn sm danger" id="reset">Revenir au modèle</button>' : ''}
           ${tab === 'evaluation' && classes.length ? `<span class="spacer"></span><a class="btn" href="#/evaluation/${actId}/${level}${classId ? `?classe=${classId}` : ''}">Évaluer les élèves →</a>` : ''}
         </div>
@@ -176,7 +176,7 @@
       } else {
         doc.contentEditable = 'true';
         doc.focus();
-        editBtn.textContent = '💾 Enregistrer mes modifications';
+        editBtn.textContent = 'Enregistrer mes modifications';
         editBtn.classList.add('primary');
         EPS.ui.toast('Cliquez dans le document pour modifier le texte');
       }

@@ -19,17 +19,18 @@
         </div>
       </div>
       <nav class="nav" id="nav">
-        <a href="#/" data-route="home"><span class="ico">⌂</span>Accueil</a>
-        <a href="#/profil" data-route="profil"><span class="ico">👤</span>Profil</a>
-        <a href="#/classes" data-route="classes"><span class="ico">👥</span>Classes</a>
-        <a href="#/calendrier" data-route="calendrier"><span class="ico">📅</span>Calendrier</a>
-        <a href="#/emploi-du-temps" data-route="emploi-du-temps"><span class="ico">🕘</span>Mon emploi du temps</a>
-        <a href="#/equipe" data-route="equipe"><span class="ico">🗂</span>Emplois du temps des profs</a>
-        <div class="nav-sep"></div>
-        <a href="#/ca" data-route="ca"><span class="ico">🏅</span>Champs d'apprentissage</a>
-        <a href="#/evaluation" data-route="evaluation"><span class="ico">✅</span>Fiches d'évaluation</a>
-        <div class="nav-sep"></div>
-        <a href="#/sauvegarde" data-route="sauvegarde"><span class="ico">💾</span>Sauvegarde</a>
+        <a href="#/" data-route="home"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Accueil</a>
+        <a href="#/classes" data-route="classes"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.5 2.4 3.5 5.2"/></svg>Classes</a>
+        <a href="#/emploi-du-temps" data-route="emploi-du-temps"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Mon emploi du temps</a>
+        <a href="#/calendrier" data-route="calendrier"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendrier</a>
+        <div class="nav-label">Pédagogie</div>
+        <a href="#/ca" data-route="ca"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Champs d'apprentissage</a>
+        <a href="#/evaluation" data-route="evaluation"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 13l2 2 4-4"/></svg>Fiches d'évaluation</a>
+        <a href="#/programmation" data-route="programmation"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg>Programmation EPS</a>
+        <div class="nav-label">Équipe</div>
+        <a href="#/equipe" data-route="equipe"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11M15 9v11"/></svg>Équipe EPS</a>
+        <a href="#/profil" data-route="profil"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Mon profil</a>
+        <a href="#/sauvegarde" data-route="sauvegarde"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Sauvegarde</a>
       </nav>
       <div class="sidebar-foot" id="sidebar-foot"></div>
     </aside>
@@ -50,6 +51,7 @@
   <script src="js/lib/store.js"></script>
   <script src="js/lib/timetable-pdf.js"></script>
   <script src="js/lib/sequences.js"></script>
+  <script src="js/lib/attendance.js"></script>
   <script src="js/data/programmes.js"></script>
   <script src="js/data/activities.js"></script>
   <script src="js/data/generator.js"></script>
@@ -63,6 +65,7 @@
   <script src="js/views/ca.js"></script>
   <script src="js/views/evaluation.js"></script>
   <script src="js/views/backup.js"></script>
+  <script src="js/views/programmation.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -41,7 +41,7 @@
       <div class="page-head">
         <div><h1>Emplois du temps de l'équipe EPS</h1><p>${all.length} enseignant(s) · vue d'ensemble, conflits d'installations</p></div>
         <div class="row">
-          <button class="btn" id="share">⇄ Partager / recevoir</button>
+          <button class="btn" id="share">Partager / recevoir</button>
           <button class="btn primary" id="add">＋ Ajouter un collègue</button>
         </div>
       </div>
@@ -50,7 +50,7 @@
           <div class="row"><strong>${esc(fullName(t))}</strong>${t.isMe ? '<span class="chip">moi</span>' : ''}</div>
           <div class="muted small">${t.timetable.length} créneau(x) · ${Math.round(t.timetable.reduce((s, e) => s + toMin(e.end) - toMin(e.start), 0) / 6) / 10} h</div>
           <div class="row" style="margin-top:8px">
-            ${t.isMe ? '<a class="btn sm" href="#/emploi-du-temps">Ouvrir</a>' : `<button class="btn sm" data-imp="${t.id}">⬆ PDF</button><button class="btn sm" data-addslot="${t.id}">＋</button>${S.getFile('pdf:' + t.id) ? `<button class="btn sm" data-pdf="${t.id}">📄</button>` : ''}<button class="btn sm" data-edit="${t.id}">✎</button>`}
+            ${t.isMe ? '<a class="btn sm" href="#/emploi-du-temps">Ouvrir</a>' : `<button class="btn sm" data-imp="${t.id}">Importer PDF</button><button class="btn sm" data-addslot="${t.id}">＋</button>${S.getFile('pdf:' + t.id) ? `<button class="btn sm" data-pdf="${t.id}">Voir PDF</button>` : ''}<button class="btn sm" data-edit="${t.id}" aria-label="Modifier">Modifier</button>`}
           </div>
         </div>`).join('')}</div>
 
@@ -128,8 +128,8 @@
       body: `<p>Les données restent sur chaque appareil. Pour constituer la vue d'équipe :</p>
         <ol><li><strong>Exportez</strong> votre emploi du temps et envoyez le fichier à vos collègues (mail, ENT, clé USB).</li>
         <li><strong>Importez</strong> les fichiers reçus : chaque collègue est ajouté (ou mis à jour) automatiquement.</li></ol>
-        <div class="row" style="margin-top:14px"><button class="btn primary" id="exp">⬇ Exporter mon emploi du temps</button>
-        <label class="btn">⬆ Importer un fichier de collègue<input type="file" accept=".json,application/json" id="imp" hidden multiple></label></div>`,
+        <div class="row" style="margin-top:14px"><button class="btn primary" id="exp">Exporter mon emploi du temps</button>
+        <label class="btn">Importer un fichier de collègue<input type="file" accept=".json,application/json" id="imp" hidden multiple></label></div>`,
       actions: [{ label: 'Fermer' }],
       onMount: (m) => {
         m.querySelector('#exp').onclick = () => {

@@ -92,22 +92,25 @@
         <div><h1><span style="color:${S.LEVEL_COLOR[c.level]}">●</span> ${esc(S.className(c))}</h1>
           <p>${c.students.length} élève(s)${inaptes.length ? ` · ${inaptes.length} inapte(s)` : ''}${slots.length ? ` · ${slots.map((e) => `${EPS.ui.DAYS[e.day]} ${EPS.ui.fmtTime(e.start)}`).join(', ')}` : ''}</p></div>
         <div class="row">
-          <button class="btn primary" id="plan">＋ Programmer une séquence</button>
-          <button class="btn" id="rename">✎ Renommer</button>
-          <button class="btn danger" id="delete">Supprimer la classe</button>
+          <button class="btn primary" id="appel">Faire l'appel</button>
+          <button class="btn" id="plan">＋ Séquence</button>
+          <details class="menu"><summary class="btn" aria-label="Plus d'actions">Plus ▾</summary>
+            <div class="menu-pop"><button class="btn ghost" id="rename">Renommer la classe</button><button class="btn ghost danger" id="delete">Supprimer la classe</button></div>
+          </details>
         </div>
       </div>
       <div class="tabs">
-        <button data-tab="apercu" class="${tab === 'apercu' ? 'active' : ''}">⭐ Vue d'ensemble</button>
-        <button data-tab="eleves" class="${tab === 'eleves' ? 'active' : ''}">👥 Élèves</button>
-        <button data-tab="sequences" class="${tab === 'sequences' ? 'active' : ''}">📋 Séquences</button>
-        <button data-tab="calendrier" class="${tab === 'calendrier' ? 'active' : ''}">📅 Calendrier</button>
-        <button data-tab="ca" class="${tab === 'ca' ? 'active' : ''}">🏅 CA et évaluations</button>
-        <button data-tab="creneaux" class="${tab === 'creneaux' ? 'active' : ''}">🕘 Créneaux</button>
+        <button data-tab="apercu" class="${tab === 'apercu' ? 'active' : ''}">Vue d'ensemble</button>
+        <button data-tab="eleves" class="${tab === 'eleves' ? 'active' : ''}">Élèves (${c.students.length})</button>
+        <button data-tab="sequences" class="${tab === 'sequences' ? 'active' : ''}">Séquences</button>
+        <button data-tab="calendrier" class="${tab === 'calendrier' ? 'active' : ''}">Calendrier</button>
+        <button data-tab="ca" class="${tab === 'ca' ? 'active' : ''}">CA et évaluations</button>
+        <button data-tab="creneaux" class="${tab === 'creneaux' ? 'active' : ''}">Créneaux</button>
       </div>
       <div id="tab"></div>`;
     main.querySelectorAll('[data-tab]').forEach((b) => { b.onclick = () => EPS.go(`#/classes/${c.level}/${c.id}?tab=${b.dataset.tab}`); });
     main.querySelector('#plan').onclick = () => EPS.classProgram.sequenceModal(c);
+    main.querySelector('#appel').onclick = () => EPS.att.modal(c);
     main.querySelector('#rename').onclick = () => EPS.ui.modal({
       title: 'Renommer la classe',
       body: `<div class="form-grid"><label class="field">Niveau<select name="level">${S.LEVELS.map((l) => `<option ${l === c.level ? 'selected' : ''}>${l}</option>`).join('')}</select></label><label class="field">Section<input type="text" name="section" value="${esc(c.section)}"></label></div>`,
@@ -135,8 +138,8 @@
     el.innerHTML = `
       <div class="row" style="margin-bottom:14px">
         <button class="btn primary" id="add">＋ Ajouter un élève</button>
-        <button class="btn" id="bulk">📋 Coller une liste</button>
-        <label class="btn">🖼 Importer des photos<input type="file" accept="image/*" multiple id="photos" hidden></label>
+        <button class="btn" id="bulk">Coller une liste</button>
+        <label class="btn">Importer des photos<input type="file" accept="image/*" multiple id="photos" hidden></label>
         <span class="spacer"></span>
         <input type="text" id="search" placeholder="Rechercher…" style="max-width:220px">
       </div>
@@ -179,7 +182,7 @@
         <div class="row" style="align-items:flex-start;gap:18px">
           <div style="text-align:center">
             <div id="ph">${avatar(st, 'lg')}</div>
-            <label class="btn sm" style="margin-top:8px">📷 Photo<input type="file" accept="image/*" capture="user" id="pf" hidden></label>
+            <label class="btn sm" style="margin-top:8px">Changer la photo<input type="file" accept="image/*" capture="user" id="pf" hidden></label>
           </div>
           <div class="form-grid" style="flex:1;min-width:240px">
             <label class="field">Nom<input type="text" name="lastName" value="${esc(st.lastName)}"></label>
@@ -189,6 +192,7 @@
             <label class="field full">Remarques (PAI, asthme, aménagements, AS…)<textarea name="notes">${esc(st.notes || '')}</textarea></label>
           </div>
         </div>
+        ${isNew ? '' : (() => { const h = EPS.att.studentStats(c, st.id); const parts = EPS.att.STATUSES.filter((x) => x.id !== 'P' && h[x.id]).map((x) => `<span class="chip" style="background:${x.color}1a;color:${x.color}">${h[x.id]} ${x.label.toLowerCase()}</span>`); return `<div class="row" style="margin-top:12px"><span class="muted small">Suivi des appels :</span>${parts.join('') || `<span class="chip">${h.P || 0} présence(s), rien à signaler</span>`}</div>`; })()}
         <div class="card" style="margin-top:14px;background:var(--surface-2)">
           <label class="check"><input type="checkbox" name="inapte" ${st.inapte.active ? 'checked' : ''}> Inaptitude en cours</label>
           <div class="form-grid" style="margin-top:10px">

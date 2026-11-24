@@ -37,7 +37,7 @@
         <div class="row">
           <label class="field" style="min-width:180px">Classe à évaluer<select id="cls"><option value="">— Choisir —</option>${classes.map((x) => `<option value="${x.id}" ${c && x.id === c.id ? 'selected' : ''}>${esc(S.className(x))}</option>`).join('')}</select></label>
           <a class="btn" style="align-self:flex-end" href="#/ca/${a.ca}/${a.id}/${level}${c ? `?classe=${c.id}` : ''}">Séquence →</a>
-          <button class="btn primary" style="align-self:flex-end" id="print">🖨 Imprimer</button>
+          <button class="btn primary" style="align-self:flex-end" id="print">Imprimer</button>
         </div>
       </div>
       <div class="doc">${html}</div>
@@ -68,14 +68,14 @@
     grid.innerHTML = `
       <div class="card" style="margin-top:16px">
         <div class="card-head"><h2>Positionnement — ${esc(S.className(c))}</h2>
-          <div class="row no-print"><span class="muted small">1 = ${esc(EPS.prog.DEGRES[0])} … 4 = ${esc(EPS.prog.DEGRES[3])}</span><button class="btn sm" id="csv">⬇ Export CSV</button></div></div>
-        <div class="tbl-wrap"><table class="tbl">
+          <div class="row no-print"><span class="muted small">1 = ${esc(EPS.prog.DEGRES[0])} … 4 = ${esc(EPS.prog.DEGRES[3])}</span><button class="btn sm" id="csv">Exporter (CSV)</button></div></div>
+        <div class="tbl-wrap"><table class="tbl eval-grid">
           <thead><tr><th>Élève</th>${crit.map((cr) => `<th title="${esc(cr.critere)}">${ly ? esc(cr.afl) + ' /' + cr.points : esc(cr.critere.length > 38 ? cr.critere.slice(0, 36) + '…' : cr.critere)}</th>`).join('')}<th>Abs./Inapte</th><th>Résultat</th></tr></thead>
           <tbody>${students.map((s) => { const r = data[s.id] || {}; return `<tr data-s="${s.id}">
             <td><div class="row" style="flex-wrap:nowrap">${EPS.classesUI.avatar(s)}<div><strong>${esc(s.lastName.toUpperCase())}</strong> ${esc(s.firstName)}${EPS.classesUI.isInapte(s) ? ' <span class="chip danger">inapte</span>' : ''}</div></div></td>
-            ${crit.map((_, i) => `<td><div class="deg">${[1, 2, 3, 4].map((d) => `<button class="d${d} ${r[i] === d ? 'on' : ''}" data-c="${i}" data-d="${d}">${d}</button>`).join('')}</div></td>`).join('')}
-            <td><select data-abs style="width:auto"><option value="">—</option><option value="absent" ${r.abs === 'absent' ? 'selected' : ''}>Absent</option><option value="inapte" ${r.abs === 'inapte' ? 'selected' : ''}>Inapte</option></select></td>
-            <td class="res"><strong>${esc(result(r))}</strong></td></tr>`; }).join('')}</tbody>
+            ${crit.map((cr, i) => `<td data-label="${esc(ly ? `${cr.afl} /${cr.points}` : cr.critere)}"><div class="deg">${[1, 2, 3, 4].map((d) => `<button class="d${d} ${r[i] === d ? 'on' : ''}" data-c="${i}" data-d="${d}">${d}</button>`).join('')}</div></td>`).join('')}
+            <td data-label="Absence"><select data-abs style="width:auto"><option value="">—</option><option value="absent" ${r.abs === 'absent' ? 'selected' : ''}>Absent</option><option value="inapte" ${r.abs === 'inapte' ? 'selected' : ''}>Inapte</option></select></td>
+            <td class="res" data-label="Résultat"><strong>${esc(result(r))}</strong></td></tr>`; }).join('')}</tbody>
         </table></div>
         ${ly ? '<p class="muted small">Résultat indicatif : degré 1 = 20 %, 2 = 45 %, 3 = 70 %, 4 = 100 % des points de l\'AFL. À ajuster selon le référentiel de l\'établissement.</p>' : ''}
       </div>`;

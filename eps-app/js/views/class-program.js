@@ -41,8 +41,16 @@
           </div>`).join('')}</div>`
         : `<p class="muted">Aucun élève. <a href="#/classes/${c.level}/${c.id}?tab=eleves">Ajouter les élèves</a> (un par un ou en collant une liste).</p>`}
       </div>
+      ${(() => {
+        const iso = isoDate(new Date());
+        const has = S.slotsOn(new Date()).some((e) => EPS.seq.isClassSession(e, c));
+        if (!has) return '';
+        const sm = EPS.att.summary(c, iso);
+        return `<div class="notice ${sm ? '' : 'warn'} row" style="margin-top:16px"><span>Cours aujourd'hui · ${sm ? `Appel fait : ${esc(EPS.att.summaryText(sm))}` : 'Appel pas encore fait'}</span><span class="spacer"></span><button class="btn sm ${sm ? '' : 'primary'}" id="ov-att">${sm ? 'Modifier l\'appel' : 'Faire l\'appel'}</button></div>`;
+      })()}
       <div id="seq"></div>
       <div class="card"><div class="card-head"><h2>Calendrier de la ${esc(S.className(c))}</h2><a class="btn sm" href="#/classes/${c.level}/${c.id}?tab=calendrier">Agrandir</a></div><div id="cal"></div></div>`;
+    const ovAtt = el.querySelector('#ov-att'); if (ovAtt) ovAtt.onclick = () => EPS.att.modal(c);
     el.querySelectorAll('.student').forEach((d) => { d.onclick = () => EPS.classesUI.studentModal(c, c.students.find((x) => x.id === d.dataset.id)); });
 
     const seqEl = el.querySelector('#seq');
@@ -60,9 +68,9 @@
             <div><div class="ca-num" style="color:${cur.ca.color}">${cur.ca.id} · ${cur.status === 'encours' ? 'Séquence en cours' : cur.status === 'avenir' ? 'Prochaine séquence' : 'Dernière séquence'}</div>
               <h2 style="margin:4px 0 0">${cur.activity.icon || ''} ${esc(cur.activity.nom)}</h2></div>
             <div class="row">${statusChip(cur)}
-              <a class="btn sm" href="${docLink(c, cur, 'sequence')}">📋 Plan de séquence</a>
-              <a class="btn sm" href="${docLink(c, cur, 'seances')}">🗓 Plans de séance</a>
-              <a class="btn sm" href="#/evaluation/${cur.activity.id}/${c.level}?classe=${c.id}">✅ Évaluer</a></div>
+              <a class="btn sm" href="${docLink(c, cur, 'sequence')}">Plan de séquence</a>
+              <a class="btn sm" href="${docLink(c, cur, 'seances')}">Plans de séance</a>
+              <a class="btn sm" href="#/evaluation/${cur.activity.id}/${c.level}?classe=${c.id}">Évaluer</a></div>
           </div>
           <div class="grid grid-3 keep2" style="margin-bottom:14px">
             <div class="stat"><span class="l">Du</span><span class="v" style="font-size:1.15rem">${fr(cur.dates[0]) || '—'}</span></div>
@@ -80,7 +88,7 @@
           <div class="tbl-wrap"><table class="tbl">
             <thead><tr><th>Séance</th><th>Date</th><th>Phase / objectif</th><th>Situation</th><th>Critères de réussite</th></tr></thead>
             <tbody>${rows.map((x) => `<tr class="${x.date && x.date < today ? 'done' : ''} ${next && x.k === next.k ? 'next' : ''}">
-              <td><strong>S${x.k}</strong>${x.date && x.date < today ? ' ✓' : ''}</td><td style="white-space:nowrap">${fr(x.date) || '<span class="muted">—</span>'}</td>
+              <td><a href="${docLink(c, cur, 'seances')}"><strong>S${x.k}</strong></a>${x.date && x.date < today ? ' ✓' : ''}</td><td style="white-space:nowrap">${fr(x.date) || '<span class="muted">—</span>'}</td>
               <td><strong>${esc(x.phase)}</strong><br><span class="muted small">${esc(x.objectif)}</span></td>
               <td>${esc(x.situation)}</td><td>${esc(x.criteres)}</td></tr>`).join('')}</tbody>
           </table></div>
@@ -112,10 +120,10 @@
     el.querySelectorAll('[data-edit]').forEach((b) => { b.onclick = () => sequenceModal(c, (c.sequences || []).find((s) => s.id === b.dataset.edit)); });
   }
 
-  function sequenceModal(c, seq) {
+  function sequenceModal(c, seq, preset = {}) {
     const isNew = !seq;
     const pr = S.state.profile.prefs;
-    const s = seq ? { ...seq } : { id: uid(), activityId: '', start: EPS.seq.nextStart(c), sessions: pr.sessionsPerSequence || 8, minutes: pr.sessionMinutes || 110 };
+    const s = seq ? { ...seq } : { id: uid(), activityId: preset.activityId || '', start: EPS.seq.nextStart(c), sessions: pr.sessionsPerSequence || 8, minutes: pr.sessionMinutes || 110 };
     const cas = EPS.prog.caForLevel(c.level);
     EPS.ui.modal({
       title: isNew ? `Programmer une séquence — ${S.className(c)}` : 'Modifier la séquence',
