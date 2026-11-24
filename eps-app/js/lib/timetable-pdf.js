@@ -20,26 +20,38 @@
   const fromMin = (m) => toHM(Math.floor(m / 60), Math.round(m % 60));
   const validHour = (h) => h >= 6 && h <= 21;
 
+  const SEC = '([A-H1-9])(?![\\dh:])';
   const CLASS_RES = [
-    { re: /\b([3-6])\s*(?:e|eme|em|°)?\s*[-_ ]?\s*([A-H1-9])\b/i, lvl: (m) => `${m[1]}e` },
-    { re: /\b(?:2nde|2de|2nd|seconde)\s*[-_ ]?\s*([A-H1-9]{1,2})\b/i, lvl: () => '2nde', sec: 1 },
-    { re: /\b(?:1re|1ere|1ère|premiere|première)\s*[-_ ]?\s*([A-H1-9]{1,2})\b/i, lvl: () => '1re', sec: 1 },
-    { re: /\b(?:tle|term|terminale|t)\s*[-_ ]?\s*([A-H1-9]{1,2})\b/i, lvl: () => 'Tle', sec: 1 },
+    { re: /\b([3-6])\s*(?:e|eme|ème|em|°)?(?:\s*[-.]?\s*([A-H])|\s?([1-9]))(?![\dh:])/i, lvl: (m) => `${m[1]}e`, pick: (m) => m[2] || m[3] },
+    { re: new RegExp(`\\b(?:2nde|2de|2nd|seconde)\\s*[-. ]{0,2}\\s*${SEC}`, 'i'), lvl: () => '2nde', sec: 1 },
+    { re: new RegExp(`\\b(?:1re|1ere|1ère|premiere|première|1)\\s*[-. ]{0,2}\\s*([A-H])(?![\\dh:])`, 'i'), lvl: () => '1re', sec: 1 },
+    { re: new RegExp(`\\b(?:tle|term|terminale)\\s*[-. ]{0,2}\\s*${SEC}`, 'i'), lvl: () => 'Tle', sec: 1 },
   ];
   function detectClass(text) {
+    text = text.replace(/_/g, ' ');
     for (const c of CLASS_RES) {
       const m = text.match(c.re);
-      if (m) return { level: c.lvl(m), section: (c.sec ? m[c.sec] : m[2]).toUpperCase() };
+      if (m) return { level: c.lvl(m), section: (c.pick ? c.pick(m) : m[c.sec]).toUpperCase() };
     }
     return null;
   }
   const PLACE_RE = /\b(gymnase|gym|stade|piscine|dojo|piste|plateau|terrain|salle\s*[\w-]+|city|halle|mur d'escalade|complexe\s*\w+|parc\s*\w+)\b/i;
   function detectPlace(text, installations = []) {
-    const n = norm(text);
-    const inst = installations.find((i) => i && n.includes(norm(i)));
-    if (inst) return inst;
+    const lines = text.split(' / ').map((l) => l.trim());
+    for (const l of lines) { const n = norm(l); if (installations.some((i) => i && n.includes(norm(i)))) return l; }
+    for (const l of lines) { if (PLACE_RE.test(l) && l.length <= 40 && !/suppl/i.test(l)) return l.replace(/^_+/, ''); }
     const m = text.match(PLACE_RE);
     return m ? m[0].replace(/\s+/g, ' ') : '';
+  }
+  /** Nature du créneau (cours d'EPS, AS, concertation, surveillance…). */
+  function detectKind(text) {
+    if (/atelier/i.test(text)) return { type: 'cours', label: 'Atelier sportif' };
+    if (/\b(AS|UNSS|association sportive)\b/i.test(text)) return { type: 'AS', label: 'AS / UNSS' };
+    if (/\bd\.?\s?s\.?\s?t\b|devoir surveill/i.test(text)) return { type: 'autre', label: 'D.S.T (surveillance)' };
+    if (/concertation|r[ée]union|conseil/i.test(text)) return { type: 'autre', label: (text.match(/concertation|r[ée]union|conseil[^/]*/i) || ['Réunion'])[0].replace(/^./, (c) => c.toUpperCase()) };
+    if (/suppl[ée]ance|remplacement/i.test(text)) return { type: 'autre', label: 'Suppléance' };
+    if (/perm(anence)?\b|vie de classe/i.test(text)) return { type: 'autre', label: 'Vie scolaire' };
+    return { type: 'cours', label: '' };
   }
   function detectWeek(text) {
     const m = norm(text).match(/\b(?:sem(?:aine)?\.?\s*|s)([ab])\b|\bq([12])\b/);
@@ -75,21 +87,24 @@
   }
 
   function buildEntry(day, start, end, text, opts, confidence) {
+    const kind = detectKind(text);
     const cls = detectClass(text);
+    const clsName = cls ? `${cls.level} ${cls.section}` : '';
     let classId = '';
-    if (cls && opts.classes) {
+    if (cls && kind.type !== 'autre' && opts.classes) {
       const found = opts.classes.find((c) => c.level === cls.level && c.section.toUpperCase() === cls.section);
       if (found) classId = found.id;
     }
-    const isAS = /\b(AS|UNSS|association sportive)\b/i.test(text);
+    const label = kind.type === 'autre'
+      ? [kind.label, clsName].filter(Boolean).join(' ')
+      : kind.label || clsName || text.split(' / ')[0].slice(0, 40);
     return {
-      day, start, end,
-      classId,
-      detectedClass: cls ? `${cls.level} ${cls.section}` : '',
-      label: cls ? `${cls.level} ${cls.section}` : (isAS ? 'AS / UNSS' : text.slice(0, 40)),
-      place: detectPlace(text, opts.installations),
+      day, start, end, classId,
+      detectedClass: kind.type === 'autre' ? '' : clsName,
+      label,
+      place: kind.type === 'autre' && /suppl/i.test(text) ? '' : detectPlace(text, opts.installations),
       week: detectWeek(text),
-      type: isAS ? 'AS' : 'cours',
+      type: kind.type,
       raw: text,
       confidence,
     };
@@ -140,8 +155,26 @@
     // 3. Contenu des cases
     const cellItems = items.filter((it) => it.top >= headerBottom - 1 && it.x + it.w / 2 > gridLeft && !dayOf(it.str));
     const entries = [];
+    const PURE_TIME = /^\s*(\d{1,2})\s*[hH:]\s*(\d{2})\s*$/;
     for (const col of cols) {
       const inCol = cellItems.filter((it) => { const cx = it.x + it.w / 2; return cx >= col.left && cx < col.right; });
+      // Mode « étiquettes dans la colonne » (Pronote / Index Education) : chaque case commence
+      // par son heure de début et la case suivante (ou l'étiquette de fin) donne l'heure de fin.
+      const labels = inCol.filter((it) => PURE_TIME.test(it.str) && validHour(+it.str.match(PURE_TIME)[1]))
+        .map((it) => ({ top: it.top, t: mins(...it.str.match(PURE_TIME).slice(1, 3)) }))
+        .sort((a, b) => a.top - b.top);
+      if (labels.length >= 2) {
+        const texts = inCol.filter((it) => !PURE_TIME.test(it.str));
+        for (let i = 0; i < labels.length - 1; i++) {
+          const a = labels[i], b = labels[i + 1];
+          if (b.t <= a.t) continue;
+          const inside = texts.filter((it) => it.top >= a.top - 3 && it.top < b.top - 3);
+          if (!inside.length) continue;
+          const text = linesOf(inside).map((l) => l.text).join(' / ');
+          entries.push(buildEntry(col.day, fromMin(a.t), fromMin(b.t), text, opts, 'bonne'));
+        }
+        continue;
+      }
       const lines = linesOf(inCol);
       if (!lines.length) continue;
       const lh = median(lines.map((l) => Math.max(...l.items.map((i) => i.h)))) || 10;
@@ -217,7 +250,15 @@
     const seen = new Set();
     const entries = all.filter((e) => { const k = `${e.day}|${e.start}|${e.end}|${e.label}`; if (seen.has(k)) return false; seen.add(k); return true; })
       .sort((a, b) => a.day - b.day || a.start.localeCompare(b.start));
-    return { entries, mode };
+    // Heures consécutives identiques (même classe, même lieu) = une seule séance
+    const merged = [];
+    for (const e of entries) {
+      const last = merged[merged.length - 1];
+      if (last && last.day === e.day && last.end === e.start && last.label === e.label && last.place === e.place && last.type === e.type && last.week === e.week) {
+        last.end = e.end;
+      } else merged.push({ ...e });
+    }
+    return { entries: merged, mode };
   }
 
   /* ---------- Côté navigateur : pdf.js ---------- */
@@ -287,7 +328,7 @@
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
   }
 
-  const api = { parseTimetable, detectClass, detectPlace, detectWeek, extractPages, renderPage, loadPdfJs };
+  const api = { parseTimetable, detectClass, detectPlace, detectKind, detectWeek, extractPages, renderPage, loadPdfJs };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root.EPS) root.EPS.pdf = api;
 })(typeof window !== 'undefined' ? window : globalThis);

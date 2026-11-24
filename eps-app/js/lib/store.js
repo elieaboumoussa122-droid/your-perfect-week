@@ -114,7 +114,12 @@
       .filter((e) => e.day === date.getDay() && (!e.week || e.week === '*' || !wt || e.week === wt))
       .sort((a, b) => EPS.ui.toMin(a.start) - EPS.ui.toMin(b.start));
   }
-  const entryLabel = (e) => (e.classId && classById(e.classId) ? className(classById(e.classId)) : e.label || 'Créneau');
+  const entryLabel = (e) => {
+    const c = e.classId && classById(e.classId);
+    if (!c) return e.label || 'Créneau';
+    const n = className(c);
+    return e.label && e.label !== n ? `${n} · ${e.label}` : n;
+  };
   const entryColor = (e) => {
     const c = e.classId && classById(e.classId);
     if (c) return LEVEL_COLOR[c.level];

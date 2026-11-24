@@ -55,7 +55,7 @@
         <label class="field">Début<input type="time" name="start" value="${e.start}"></label>
         <label class="field">Fin<input type="time" name="end" value="${e.end}"></label>
         ${withClasses ? `<label class="field">Classe<select name="classId">${classOptions(e.classId)}</select></label>` : ''}
-        <label class="field">Libellé ${withClasses ? '(si pas de classe)' : ''}<input type="text" name="label" value="${esc(e.label)}" placeholder="AS badminton, réunion…"></label>
+        <label class="field">Libellé ${withClasses ? '/ précision' : ''}<input type="text" name="label" value="${esc(e.label)}" placeholder="AS badminton, réunion…"></label>
         <label class="field">Lieu<input type="text" name="place" value="${esc(e.place)}" list="inst-dl"><datalist id="inst-dl">${inst.map((i) => `<option>${esc(i)}</option>`).join('')}</datalist></label>
         <label class="field">Type<select name="type">${[['cours', 'Cours d\'EPS'], ['AS', 'AS / UNSS'], ['autre', 'Autre']].map(([v, l]) => `<option value="${v}" ${e.type === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
       </div>`,
