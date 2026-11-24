@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EPS Pro — Espace enseignant</title>
+  <meta name="description" content="Application de l'équipe EPS : profil, classes, emplois du temps, champs d'apprentissage, plans de séquence et de séance.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f766e'/%3E%3Ctext x='32' y='42' font-size='26' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3EEPS%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">EPS</div>
+        <div>
+          <div class="brand-name">EPS Pro</div>
+          <div class="brand-sub" id="brand-school">Espace enseignant</div>
+        </div>
+      </div>
+      <nav class="nav" id="nav">
+        <a href="#/" data-route="home"><span class="ico">⌂</span>Accueil</a>
+        <a href="#/profil" data-route="profil"><span class="ico">👤</span>Profil</a>
+        <a href="#/classes" data-route="classes"><span class="ico">👥</span>Classes</a>
+        <a href="#/calendrier" data-route="calendrier"><span class="ico">📅</span>Calendrier</a>
+        <a href="#/emploi-du-temps" data-route="emploi-du-temps"><span class="ico">🕘</span>Mon emploi du temps</a>
+        <a href="#/equipe" data-route="equipe"><span class="ico">🗂</span>Emplois du temps des profs</a>
+        <div class="nav-sep"></div>
+        <a href="#/ca" data-route="ca"><span class="ico">🏅</span>Champs d'apprentissage</a>
+        <a href="#/evaluation" data-route="evaluation"><span class="ico">✅</span>Fiches d'évaluation</a>
+        <div class="nav-sep"></div>
+        <a href="#/sauvegarde" data-route="sauvegarde"><span class="ico">💾</span>Sauvegarde</a>
+      </nav>
+      <div class="sidebar-foot" id="sidebar-foot"></div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="menu-btn" id="menu-btn" aria-label="Menu">☰</button>
+        <div class="crumbs" id="crumbs"></div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </header>
+      <main class="main" id="main"></main>
+    </div>
+  </div>
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+
+  <script src="js/lib/ui.js"></script>
+  <script src="js/lib/store.js"></script>
+  <script src="js/lib/timetable-pdf.js"></script>
+  <script src="js/data/programmes.js"></script>
+  <script src="js/data/activities.js"></script>
+  <script src="js/data/generator.js"></script>
+  <script src="js/views/home.js"></script>
+  <script src="js/views/profile.js"></script>
+  <script src="js/views/classes.js"></script>
+  <script src="js/views/timetable.js"></script>
+  <script src="js/views/calendar.js"></script>
+  <script src="js/views/team.js"></script>
+  <script src="js/views/ca.js"></script>
+  <script src="js/views/evaluation.js"></script>
+  <script src="js/views/backup.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
